@@ -1,2 +1,1 @@
-# LegavyHive
-N/A
+# N/A
