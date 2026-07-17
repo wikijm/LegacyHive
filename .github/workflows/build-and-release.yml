@@ -13,38 +13,19 @@ on:
 
 jobs:
   build:
-    runs-on: ${{ matrix.os }}
-    strategy:
-      matrix:
-        os: [ubuntu-latest, windows-latest, macos-latest]
-        include:
-          - os: ubuntu-latest
-            output-name: LegacyHive
-          - os: windows-latest
-            output-name: LegacyHive.exe
-          - os: macos-latest
-            output-name: LegacyHive
+    runs-on: windows-latest
     
     steps:
       - uses: actions/checkout@v4
       
-      - name: Compile on Ubuntu
-        if: runner.os == 'Linux'
-        run: g++ -o ${{ matrix.output-name }} LegacyHive.cpp -std=c++17
-      
       - name: Compile on Windows
-        if: runner.os == 'Windows'
-        run: g++ -o ${{ matrix.output-name }} LegacyHive.cpp -std=c++17
-      
-      - name: Compile on macOS
-        if: runner.os == 'macOS'
-        run: g++ -o ${{ matrix.output-name }} LegacyHive.cpp -std=c++17
+        run: g++ -o LegacyHive.exe LegacyHive.cpp -std=c++17
       
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
-          name: ${{ matrix.os }}-build
-          path: ${{ matrix.output-name }}
+          name: windows-build
+          path: LegacyHive.exe
           retention-days: 5
 
   release:
@@ -53,20 +34,17 @@ jobs:
     if: startsWith(github.ref, 'refs/tags/v')
     
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       
       - name: Download all artifacts
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v5
         with:
           path: artifacts
       
       - name: Create Release
-        uses: softprops/action-gh-release@v1
+        uses: softprops/action-gh-release@v3
         with:
-          files: |
-            artifacts/ubuntu-latest-build/LegacyHive
-            artifacts/windows-latest-build/LegacyHive.exe
-            artifacts/macos-latest-build/LegacyHive
+          files: artifacts/windows-build/LegacyHive.exe
           draft: false
           prerelease: false
         env:
