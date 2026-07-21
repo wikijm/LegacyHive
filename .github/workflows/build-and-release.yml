@@ -18,23 +18,26 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       
-      - name: Setup Visual Studio
-        uses: microsoft/setup-msbuild@v1.1
-        with:
-          vs-version: '17'
+      - name: Setup Visual Studio Build Tools
+        uses: microsoft/setup-msbuild@v2
       
-      - name: Install Windows SDK
-        shell: powershell
+      - name: Setup MSVC with vcvars
+        shell: cmd
         run: |
-          # Install Windows SDK with Offline Registry support
-          $sdkVersion = "10.0.22621.0"
-          choco install windows-sdk-10.1 -y --no-progress
+          REM Find and run vcvars64.bat to set up the MSVC environment
+          for /f "tokens=*" %%i in ('where vcvars64.bat') do set VCVARS=%%i
+          if defined VCVARS (
+            call "%VCVARS%"
+          ) else (
+            REM Fallback: try default path
+            call "C:\Program Files\Microsoft Visual Studio\2022\Enterprise\VC\Auxiliary\Build\vcvars64.bat"
+          )
       
       - name: Compile on Windows
         shell: cmd
         run: |
           REM Set up MSVC environment
-          call "C:\Program Files\Microsoft Visual Studio\2022\Enterprise\VC\Auxiliary\Build\vcvars64.bat"
+          for /f "tokens=*" %%i in ('where vcvars64.bat') do call "%%i"
           
           REM Compile with proper include and library paths
           cl /O2 /std:c++17 LegacyHive.cpp ^
