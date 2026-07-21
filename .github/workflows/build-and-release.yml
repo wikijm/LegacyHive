@@ -18,9 +18,6 @@ jobs:
     steps:
       - uses: actions/checkout@v5
       
-      - name: Install Windows SDK
-        run: choco install windows-sdk -y
-    
       - name: Compile on Windows
         run: g++ -o LegacyHive.exe LegacyHive.cpp -std=c++17
       
