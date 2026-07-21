@@ -21,7 +21,7 @@ jobs:
       - name: Setup Visual Studio
         uses: microsoft/setup-msbuild@v1.1
         with:
-          vs-version: '17.x'
+          vs-version: '17'
       
       - name: Install Windows SDK
         shell: powershell
